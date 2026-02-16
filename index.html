@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatx</title>
+<style>
+  body { font-family: Arial; max-width: 600px; margin: 50px auto; }
+  #chat { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+  #message { width: 80%; }
+  button { padding: 5px 10px; margin-top: 5px; }
+</style>
+</head>
+<body>
+<h1>Chatx</h1>
+
+<div id="login-section">
+  <button id="loginBtn">Вход / Регистрация</button>
+  <button id="logoutBtn" style="display:none;">Выход</button>
+</div>
+
+<div id="chat-section" style="display:none;">
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Напиши сообщение...">
+  <button id="sendBtn">Отправить</button>
+</div>
+
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  const netlifyIdentity = window.netlifyIdentity;
+  netlifyIdentity.init();
+
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const chatSection = document.getElementById('chat-section');
+  const chatBox = document.getElementById('chat');
+  const messageInput = document.getElementById('message');
+  const sendBtn = document.getElementById('sendBtn');
+
+  loginBtn.onclick = () => netlifyIdentity.open('login');
+  logoutBtn.onclick = () => netlifyIdentity.logout();
+
+  netlifyIdentity.on('login', user => {
+    document.getElementById('login-section').style.display = 'none';
+    chatSection.style.display = 'block';
+    logoutBtn.style.display = 'inline';
+    loadMessages();
+  });
+
+  netlifyIdentity.on('logout', () => {
+    document.getElementById('login-section').style.display = 'block';
+    chatSection.style.display = 'none';
+    logoutBtn.style.display = 'none';
+  });
+
+  sendBtn.onclick = async () => {
+    const text = messageInput.value.trim();
+    if(!text) return;
+    await fetch('/.netlify/functions/sendMessage', {
+      method: 'POST',
+      body: JSON.stringify({ user: netlifyIdentity.currentUser().email, text }),
+    });
+    messageInput.value = '';
+    loadMessages();
+  };
+
+  async function loadMessages(){
+    const res = await fetch('/.netlify/functions/getMessages');
+    const messages = await res.json();
+    chatBox.innerHTML = messages.map(m => `<b>${m.user}:</b> ${m.text}`).join('<br>');
+  }
+
+  setInterval(loadMessages, 3000);
+</script>
+</body>
+</html>
