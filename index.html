@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatx</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">Chatx</div>
+  <div class="auth-buttons" id="authButtons">
+    <button onclick="openAuth()">Вход / Регистрация</button>
+  </div>
+  <div class="user-panel" id="userPanel" style="display:none;">
+    <span id="currentUser"></span>
+    <button onclick="logout()">Выйти</button>
+  </div>
+</header>
+
+<main>
+  <div class="write-to">
+    <input id="targetNick" placeholder="Написать по никнейму">
+    <button onclick="openChat()">Написать</button>
+  </div>
+
+  <div class="chat">
+    <div class="messages" id="messages"></div>
+
+    <div class="send">
+      <input id="messageInput" placeholder="Введите сообщение">
+      <button onclick="sendMessage()">Отправить</button>
+    </div>
+  </div>
+</main>
+
+<!-- Модалка -->
+<div class="modal" id="authModal">
+  <div class="modal-content">
+    <h3>Вход / Регистрация</h3>
+    <input id="authNick" placeholder="Никнейм">
+    <input id="authPass" type="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+    <button onclick="register()">Регистрация</button>
+    <button class="close" onclick="closeAuth()">Закрыть</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
